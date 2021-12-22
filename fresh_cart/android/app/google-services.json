@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "310046067337",
+    "project_id": "freshcar-36c43",
+    "storage_bucket": "freshcar-36c43.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310046067337:android:4028d7b91499f82c425458",
+        "android_client_info": {
+          "package_name": "com.example.fresh_car"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "310046067337-qm546po20c1qvod7rbq9ibdpte2td1g3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fresh_car",
+            "certificate_hash": "2720c970b5bb0ad2f0eb9f332f96fea2ff390313"
+          }
+        },
+        {
+          "client_id": "310046067337-rppur46sk5reuabvv2usv1t1brg8di3d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpgSonGzBr3qy_N-GfyLM-GleOtssG0Xw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "310046067337-rppur46sk5reuabvv2usv1t1brg8di3d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
