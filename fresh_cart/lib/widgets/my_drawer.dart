@@ -64,6 +64,9 @@ class MyDrawer extends StatelessWidget {
                   if (_resp) {
                     ToastUtils.show(msg: "Đăng xuất thành công!");
                     productViewModel.getProducts();
+                    productViewModel.getHouseWareProducts();
+                    productViewModel.getMeatProducts();
+                    productViewModel.getVegetableProducts();
                   }
                 } else {
                   ToastUtils.show(msg: "Bạn chưa đăng nhập");

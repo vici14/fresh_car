@@ -10,8 +10,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class ProductCardItem extends StatefulWidget {
   final ProductModel productModel;
+  final bool isFromHomeScreen;
 
-  const ProductCardItem({Key? key, required this.productModel})
+  const ProductCardItem(
+      {Key? key, required this.productModel, this.isFromHomeScreen = true})
       : super(key: key);
 
   @override
@@ -131,6 +133,10 @@ class _ProductCardItemState extends State<ProductCardItem> {
                       if (userVM.isLoggedIn) {
                         if (!product.isLiked) {
                           userVM.likeProduct(product.changeLikeStatus());
+                          widget.isFromHomeScreen
+                              ? productViewModel.updateLikeStatus(product)
+                              : productViewModel
+                                  .updateLikeStatusInCategory(product);
                         } else {
                           userVM.unlikeProduct(product);
                         }

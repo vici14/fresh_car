@@ -51,7 +51,10 @@ class _MeatTabState extends BaseProductCategoryScreen<MeatTab> {
               } else {
                 product = super.productVM.meatProducts[index];
               }
-              return ProductCardItem(productModel: product);
+              return ProductCardItem(
+                productModel: product,
+                isFromHomeScreen: false,
+              );
             });
       },
     );

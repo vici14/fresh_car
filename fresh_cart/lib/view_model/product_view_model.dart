@@ -40,6 +40,60 @@ class ProductViewModel extends BaseViewModel {
 
   //=======================FIELD VALUE=========================
 
+  void updateLikeStatus(ProductModel productModel) {
+    ///use when like product at home
+    productsAfterLoggedIn
+        ?.firstWhere((element) => element.id == productModel.id)
+        .isLiked = true;
+    _updateLikeStatusInCategory(productModel: productModel);
+    notifyListeners();
+  }
+
+  void _updateLikeStatusInCategory({required ProductModel productModel}) {
+    ///use for like product at category
+    switch (productModel.category) {
+      case "meat":
+        meatProductsAfterLoggedIn
+            .firstWhere((element) => element.id == productModel.id)
+            .isLiked = true;
+        break;
+      case "vegetable":
+        vegetableProductsAfterLoggedIn
+            .firstWhere((element) => element.id == productModel.id)
+            .isLiked = true;
+        break;
+      case "house_ware":
+        houseWareProductsAfterLoggedIn
+            .firstWhere((element) => element.id == productModel.id)
+            .isLiked = true;
+        break;
+    }
+  }
+
+  void updateLikeStatusInCategory(ProductModel productModel) {
+    ///use for like product at category
+    switch (productModel.category) {
+      case "meat":
+        meatProductsAfterLoggedIn
+            .firstWhere((element) => element.id == productModel.id)
+            .isLiked = true;
+        break;
+      case "vegetable":
+        vegetableProductsAfterLoggedIn
+            .firstWhere((element) => element.id == productModel.id)
+            .isLiked = true;
+        break;
+      case "house_ware":
+        houseWareProductsAfterLoggedIn
+            .firstWhere((element) => element.id == productModel.id)
+            .isLiked = true;
+        break;
+    }
+    productsAfterLoggedIn
+        ?.firstWhere((element) => element.id == productModel.id)
+        .isLiked = true;
+  }
+
   Future<bool> getProducts() async {
     try {
       isLoadingProduct = true;

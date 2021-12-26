@@ -54,7 +54,10 @@ class _VegetableTabState extends BaseProductCategoryScreen<VegetableTab> {
               } else {
                 product = super.productVM.vegetableProducts[index];
               }
-              return ProductCardItem(productModel: product);
+              return ProductCardItem(
+                productModel: product,
+                isFromHomeScreen: false,
+              );
             });
       },
     );

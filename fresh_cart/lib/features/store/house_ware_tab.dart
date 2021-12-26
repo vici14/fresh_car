@@ -51,7 +51,10 @@ class _HouseWareTabState extends BaseProductCategoryScreen<HouseWareTab> {
               } else {
                 product = super.productVM.houseWareProducts[index];
               }
-              return ProductCardItem(productModel: product);
+              return ProductCardItem(
+                productModel: product,
+                isFromHomeScreen: false,
+              );
             });
       },
     );
