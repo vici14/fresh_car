@@ -55,4 +55,9 @@ class UserRepositoryImpl extends UserRepository {
       {required String uid, required ProductModel productModel}) async {
     return serviceManager.unlikeProduct(uid: uid, productModel: productModel);
   }
+
+  @override
+  Future<UserModel?> logOut() async {
+    return await serviceManager.logOut();
+  }
 }

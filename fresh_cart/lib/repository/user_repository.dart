@@ -23,4 +23,6 @@ abstract class UserRepository {
       {required String uid, required ProductModel productModel});
 
   Future<UserModel?> getCurrentUser();
+
+  Future<UserModel?> logOut();
 }

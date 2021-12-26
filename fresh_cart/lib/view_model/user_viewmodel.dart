@@ -81,4 +81,16 @@ class UserViewModel extends BaseViewModel {
       refreshCurrentUser();
     }
   }
+
+  Future<bool> logOut() async {
+    try {
+      currentUser = await _repository.logOut();
+      isLoggedIn = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      print("logOut :${e.toString()}");
+    }
+    return false;
+  }
 }

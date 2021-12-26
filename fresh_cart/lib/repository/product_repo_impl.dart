@@ -16,8 +16,7 @@ class ProductRepositoryImplement extends ProductRepository {
   }
 
   @override
-  Future<List<ProductModel>> getProductsByCategory(String categoryId) {
-    // TODO: implement getProductsByCategory
-    throw UnimplementedError();
+  Future<List<ProductModel>> getProductsByCategory(String categoryId) async {
+    return await serviceManager.getProductsByCategory(categoryId);
   }
 }

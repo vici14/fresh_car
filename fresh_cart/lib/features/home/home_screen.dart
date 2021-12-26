@@ -29,6 +29,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     productViewModel.getProducts();
+
+    if (userViewModel.isLoggedIn) {
+      productViewModel.getProductsAfterUserLoggedIn(
+          userViewModel.currentUser!.favoriteProducts!);
+    }
     super.didChangeDependencies();
   }
 
@@ -97,10 +102,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
-                              ProductModel product = productVM.products![index];
+                              ProductModel product;
+                              if (userViewModel.isLoggedIn) {
+                                product = productViewModel
+                                    .productsAfterLoggedIn![index];
+                              } else {
+                                product = productVM.products![index];
+                              }
+
                               return ProductCardItem(productModel: product);
                             },
-                            childCount: productVM.products?.length,
+                            childCount: userViewModel.isLoggedIn
+                                ? productViewModel.productsAfterLoggedIn?.length
+                                : productViewModel.products?.length,
                           ),
                         )),
                   ],

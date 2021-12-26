@@ -89,7 +89,38 @@ class ServiceManager {
     return [];
   }
 
+  Future<List<ProductModel>> getProductsByCategory(String category) async {
+    List<ProductModel> list = [];
+    var _products = await productsCollection
+        .where('category', isEqualTo: category)
+        .withConverter<ProductModel>(
+            fromFirestore: (snapshot, _) =>
+                ProductModel.fromQuerySnapshot(snapshot.data()!),
+            toFirestore: (product, _) => product.toJson())
+        .get();
+    try {
+      list = List.generate(
+              _products.docs.length, (index) => _products.docs[index].data())
+          .toList();
+      // _products.docs.forEach((element) {
+      //   var product = ProductModel.fromQuerySnapshot(
+      //       element.data() as Map<String, dynamic>);
+      //   list.add(element.data());
+      // });
+      print('product by category ne  :${_products}');
+      return list;
+    } catch (e) {
+      print('getProductsByCategory:${e.toString()}');
+    }
+    return [];
+  }
+
 //====================USER=======================
+
+  Future<UserModel?> logOut() async {
+    await FirebaseAuth.instance.signOut();
+    return null;
+  }
 
   Future<UserModel?> getCurrentUser() async {
     var currentUser = FirebaseAuth.instance.currentUser;
@@ -152,11 +183,12 @@ class ServiceManager {
     var _currentUser = await getCurrentUserDocument(uid);
     _currentUser.update({
       'favoriteProducts': FieldValue.arrayUnion([productModel.toJson()])
-    }).then((value) {
-      updateProductLiked(
-          productId: productModel.id ?? '', status: productModel.isLiked);
-      print('add to favorite success');
-    }).catchError((onError) => print('failed add to favorite'));
+    });
+    //     .then((value) {
+    //   updateProductLiked(
+    //       productId: productModel.id ?? '', status: productModel.isLiked);
+    //   print('add to favorite success');
+    // }).catchError((onError) => print('failed add to favorite'));
   }
 
   void updateProductLiked(
@@ -175,11 +207,12 @@ class ServiceManager {
     var _currentUser = await getCurrentUserDocument(uid);
     _currentUser.update({
       'favoriteProducts': FieldValue.arrayRemove([productModel.toJson()])
-    }).then((value) {
-      updateProductLiked(
-          productId: productModel.id ?? '', status: productModel.isLiked);
-      print('remove from favorite success');
-    }).catchError((onError) => print('failed remove'));
+    });
+    // .then((value) {
+    //   updateProductLiked(
+    //       productId: productModel.id ?? '', status: productModel.isLiked);
+    //   print('remove from favorite success');
+    // }).catchError((onError) => print('failed remove'));
   }
 
   Future<bool> updateProfile(

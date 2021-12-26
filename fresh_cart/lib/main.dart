@@ -27,6 +27,7 @@ class FreshCar extends StatefulWidget {
 
 class _FreshCarState extends State<FreshCar> {
   Future<bool>? _initDependencies;
+
   @override
   void initState() {
     _initDependencies = initDependencies();

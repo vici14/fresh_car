@@ -1,4 +1,5 @@
 import 'package:fresh_car/model/product_model.dart';
+import 'package:fresh_car/model/user_model.dart';
 import 'package:fresh_car/repository/product_repo_impl.dart';
 import 'package:fresh_car/repository/product_repository.dart';
 import 'package:fresh_car/view_model/base_viewmodel.dart';
@@ -21,9 +22,21 @@ class ProductViewModel extends BaseViewModel {
   ProductRepository _repository = ProductRepositoryImplement();
 
   //=======================FIELD VALUE=========================
-
-  List<ProductModel>? products;
   bool isLoadingProduct = false;
+  List<ProductModel>? products;
+  List<ProductModel>? productsAfterLoggedIn;
+
+  bool isLoadingVegetable = false;
+  List<ProductModel> vegetableProducts = [];
+  List<ProductModel> vegetableProductsAfterLoggedIn = [];
+
+  bool isLoadingMeat = false;
+  List<ProductModel> meatProducts = [];
+  List<ProductModel> meatProductsAfterLoggedIn = [];
+
+  bool isLoadingHouseWare = false;
+  List<ProductModel> houseWareProducts = [];
+  List<ProductModel> houseWareProductsAfterLoggedIn = [];
 
   //=======================FIELD VALUE=========================
 
@@ -37,6 +50,120 @@ class ProductViewModel extends BaseViewModel {
       return true;
     } catch (e) {
       print(e.toString());
+    }
+    return false;
+  }
+
+  Future<bool> getMeatProducts() async {
+    try {
+      isLoadingMeat = true;
+      notifyListeners();
+      meatProducts = await _repository.getProductsByCategory('meat');
+      isLoadingMeat = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      print(e.toString());
+    }
+    return false;
+  }
+
+  Future<bool> getVegetableProducts() async {
+    try {
+      isLoadingVegetable = true;
+      notifyListeners();
+      vegetableProducts = await _repository.getProductsByCategory('vegetable');
+      isLoadingVegetable = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      print(e.toString());
+    }
+    return false;
+  }
+
+  Future<bool> getHouseWareProducts() async {
+    try {
+      isLoadingHouseWare = true;
+      notifyListeners();
+      houseWareProducts = await _repository.getProductsByCategory('house_ware');
+      isLoadingHouseWare = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      print(e.toString());
+    }
+    return false;
+  }
+
+  Future<bool> updateCategoryProductsAfterUserLoggedIn(
+      List<ProductModel> favoriteProducts) async {
+    try {
+      setBusy(true);
+      meatProductsAfterLoggedIn =
+          await _updateProductByCategoryAfterUserLoggedIn(
+              category: "meat", favoriteProducts: favoriteProducts);
+      vegetableProductsAfterLoggedIn =
+          await _updateProductByCategoryAfterUserLoggedIn(
+              category: "vegetable", favoriteProducts: favoriteProducts);
+      houseWareProductsAfterLoggedIn =
+          await _updateProductByCategoryAfterUserLoggedIn(
+              category: "house_ware", favoriteProducts: favoriteProducts);
+      setBusy(false);
+      return true;
+    } catch (e) {
+      print("updateCategoryProductsAfterUserLoggedIn:${e.toString()}");
+    }
+    return false;
+  }
+
+  Future<List<ProductModel>> _updateProductByCategoryAfterUserLoggedIn(
+      {required String category,
+      required List<ProductModel> favoriteProducts}) async {
+    List<ProductModel> _products = [];
+    List<ProductModel> _result = [];
+    switch (category) {
+      case "meat":
+        await getMeatProducts();
+        _products = meatProducts;
+        break;
+      case "vegetable":
+        await getVegetableProducts();
+        _products = vegetableProducts;
+        break;
+      case "house_ware":
+        await getHouseWareProducts();
+        _products = houseWareProducts;
+        break;
+    }
+    _products.forEach((prod) {
+      var _needUpdatedProd = favoriteProducts
+          .firstWhere((element) => element.id == prod.id, orElse: () => prod);
+      prod.isLiked = _needUpdatedProd.isLiked;
+      _result.add(prod);
+    });
+    return _result;
+  }
+
+  Future<bool> getProductsAfterUserLoggedIn(
+      List<ProductModel> favoriteProducts) async {
+    List<ProductModel> _products = [];
+    try {
+      var _resp = await getProducts();
+      if (products != null && products!.isNotEmpty) {
+        products?.forEach((prod) {
+          var _needUpdatedProd = favoriteProducts.firstWhere(
+              (element) => element.id == prod.id,
+              orElse: () => prod);
+          prod.isLiked = _needUpdatedProd.isLiked;
+          _products.add(prod);
+        });
+        productsAfterLoggedIn = _products;
+        notifyListeners();
+        return true;
+      }
+    } catch (e) {
+      print("getProductsAfterUserLoggedIn:${e.toString()}");
     }
     return false;
   }

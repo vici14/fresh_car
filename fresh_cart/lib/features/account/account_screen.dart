@@ -5,6 +5,7 @@ import 'package:fresh_car/model/ordered_product_model.dart';
 import 'package:fresh_car/model/product_model.dart';
 import 'package:fresh_car/model/user_model.dart';
 import 'package:fresh_car/utils/validation_util.dart';
+import 'package:fresh_car/view_model/product_view_model.dart';
 import 'package:fresh_car/view_model/user_viewmodel.dart';
 import 'package:fresh_car/widgets/my_app_bar.dart';
 import 'package:fresh_car/widgets/my_drawer.dart';
@@ -24,9 +25,11 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
+  ProductViewModel? _productViewModel;
 
   @override
   Widget build(BuildContext context) {
+    _productViewModel = Provider.of<ProductViewModel>(context, listen: false);
     String email = 'cuongchau3@gmail.com';
     String password = '123456789';
     return GestureDetector(
@@ -51,9 +54,16 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                           email: email, password: password);
                     }),
                     _buildSignInButton(
-                      onTap: () {
-                        userVM.signInWithEmailAndPassword(
+                      onTap: () async {
+                        var _resp = await userVM.signInWithEmailAndPassword(
                             email: email, password: password);
+                        if (_resp) {
+                          _productViewModel?.getProductsAfterUserLoggedIn(
+                              userVM.currentUser!.favoriteProducts!);
+                          _productViewModel
+                              ?.updateCategoryProductsAfterUserLoggedIn(
+                                  userVM.currentUser!.favoriteProducts!);
+                        }
                       },
                     ),
                   ],

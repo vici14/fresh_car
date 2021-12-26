@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fresh_car/features/store/category_1_tab.dart';
+import 'package:fresh_car/features/store/house_ware_tab.dart';
+import 'package:fresh_car/features/store/meat_tab.dart';
+import 'package:fresh_car/features/store/vegetable_tab.dart';
 import 'package:fresh_car/widgets/my_app_bar.dart';
 import 'package:fresh_car/widgets/my_drawer.dart';
 
@@ -55,13 +57,13 @@ class _StoreScreenState extends State<StoreScreen>
                 onTap: (index) {},
                 tabs: [
                   Tab(
-                    child: Text('Category 1'),
+                    child: Text('Rau củ quả'),
                   ),
                   Tab(
-                    child: Text('Category 2'),
+                    child: Text('Thịt cá'),
                   ),
                   Tab(
-                    child: Text('Category 3'),
+                    child: Text('Đồ gia dụng'),
                   ),
                 ],
               ),
@@ -69,13 +71,9 @@ class _StoreScreenState extends State<StoreScreen>
             Flexible(
               fit: FlexFit.loose,
               child: TabBarView(controller: _tabController, children: [
-                Category1Tab(),
-                Container(
-                  color: Colors.yellow,
-                ),
-                Container(
-                  color: Colors.green,
-                )
+                VegetableTab(),
+                MeatTab(),
+                HouseWareTab(),
               ]),
             ),
           ],

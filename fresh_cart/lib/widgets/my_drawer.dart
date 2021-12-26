@@ -3,10 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:fresh_car/features/account/account_screen.dart';
 import 'package:fresh_car/features/account/favorite_products_screen.dart';
 import 'package:fresh_car/features/account/order_history_screen.dart';
+import 'package:fresh_car/utils/toast_util.dart';
+import 'package:fresh_car/view_model/product_view_model.dart';
+import 'package:fresh_car/view_model/user_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 class MyDrawer extends StatelessWidget {
+  late UserViewModel userViewModel;
+  late ProductViewModel productViewModel;
+
   @override
   Widget build(BuildContext context) {
+    userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    productViewModel = Provider.of<ProductViewModel>(context, listen: false);
     return Container(
       width: MediaQuery.of(context).size.width * 0.6,
       height: MediaQuery.of(context).size.height * 0.85,
@@ -48,7 +57,19 @@ class MyDrawer extends StatelessWidget {
           SizedBox(
             height: 15,
           ),
-          Text('Đăng xuất', style: TextStyle(color: Colors.white)),
+          GestureDetector(
+              onTap: () async {
+                if (userViewModel.currentUser != null) {
+                  var _resp = await userViewModel.logOut();
+                  if (_resp) {
+                    ToastUtils.show(msg: "Đăng xuất thành công!");
+                    productViewModel.getProducts();
+                  }
+                } else {
+                  ToastUtils.show(msg: "Bạn chưa đăng nhập");
+                }
+              },
+              child: Text('Đăng xuất', style: TextStyle(color: Colors.white))),
         ],
       ),
     );
