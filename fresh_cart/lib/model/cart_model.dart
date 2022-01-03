@@ -19,13 +19,13 @@ class CartModel {
     this.note,
   });
 
-  double get totalPrice {
-    double _totalCost = 0;
-    orderedItems?.forEach((element) {
-      _totalCost += element.quantity * double.parse(element.cost.toString());
-    });
-    return _totalCost;
-  }
+  // double get totalPrice {
+  //   double _totalCost = 0;
+  //   orderedItems?.forEach((element) {
+  //     _totalCost += element.quantity * double.parse(element.cost.toString());
+  //   });
+  //   return _totalCost;
+  // }
 
   factory CartModel.initial() {
     return CartModel(

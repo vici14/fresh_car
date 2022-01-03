@@ -35,6 +35,20 @@ class ServiceManager {
     return _cart.docs.first.reference;
   }
 
+  Future<QuerySnapshot<OrderedProductModel>> getProductExistedInCart(
+      {required DocumentReference<CartModel> cart,
+      required String productId}) async {
+    var productInCart = await cart
+        .collection('orderedItems')
+        .where("id", isEqualTo: productId)
+        .withConverter<OrderedProductModel>(
+            fromFirestore: (data, _) =>
+                OrderedProductModel.fromQuerySnapshot(data.data()!),
+            toFirestore: (orderedProduct, _) => orderedProduct.toJson())
+        .get();
+    return productInCart;
+  }
+
   Future<DocumentReference<UserModel>> getCurrentUserDocument(
       String uid) async {
     var _user = await usersCollection
@@ -102,11 +116,6 @@ class ServiceManager {
       list = List.generate(
               _products.docs.length, (index) => _products.docs[index].data())
           .toList();
-      // _products.docs.forEach((element) {
-      //   var product = ProductModel.fromQuerySnapshot(
-      //       element.data() as Map<String, dynamic>);
-      //   list.add(element.data());
-      // });
       print('product by category ne  :${_products}');
       return list;
     } catch (e) {
@@ -235,7 +244,7 @@ class ServiceManager {
   void createCollectionCart(String uid) async {
     CartModel cartModel = CartModel.initial();
     var _currentUser = await getCurrentUserDocument(uid);
-    _currentUser.collection('cart').add(cartModel.toJson());
+    await _currentUser.collection('cart').add(cartModel.toJson());
   }
 
   void updateHistory(
@@ -250,7 +259,16 @@ class ServiceManager {
   }
 
 //====================CART=======================
-  void createCartInRegisteredUser() {}
+
+  Stream<QuerySnapshot<OrderedProductModel>> getStreamOrderedItemsInCart(
+      String uid) async* {
+    var _cart = await getUserCurrentCart(uid);
+    var a = _cart.collection('orderedItems').withConverter<OrderedProductModel>(
+        fromFirestore: (data, _) =>
+            OrderedProductModel.fromQuerySnapshot(data.data()!),
+        toFirestore: (orderedProduct, _) => orderedProduct.toJson());
+    yield* a.snapshots();
+  }
 
   void addToCart(
       {required ProductModel productModel,
@@ -259,10 +277,17 @@ class ServiceManager {
     var orderItem = OrderedProductModel.fromProductModel(
         product: productModel, quantity: quantity);
     var _cart = await getUserCurrentCart(uid);
-    _cart.update({
-      'orderedItems': FieldValue.arrayUnion([orderItem.toJson()])
-    });
-    print(_cart);
+    var productInCart =
+        await getProductExistedInCart(cart: _cart, productId: productModel.id!);
+    if (productInCart.docs.length > 0) {
+      ///if product existed,update quantity
+      var _prod = await productInCart.docs.first.reference.get();
+      productInCart.docs.first.reference
+          .update({"quantity": (_prod.data()!.quantity + quantity)});
+    } else {
+      ///if product non existed,add to collection
+      var _a = await _cart.collection('orderedItems').add(orderItem.toJson());
+    }
   }
 
   Future<CartModel?> getCart(String uid) async {

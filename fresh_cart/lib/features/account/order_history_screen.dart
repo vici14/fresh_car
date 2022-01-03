@@ -78,8 +78,8 @@ class OrderHistoryScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Tổng đơn hàng'),
-              Text(CurrencyFormatter()
-                  .toDisplayValue(cartModel.totalPrice, currency: 'VNĐ'))
+              // Text(CurrencyFormatter()
+              //     .toDisplayValue(cartModel.totalPrice, currency: 'VNĐ'))
             ],
           ),
         ],

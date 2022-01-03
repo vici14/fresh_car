@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fresh_car/model/product_model.dart';
 import 'package:fresh_car/utils/currency_formatter.dart';
 import 'package:fresh_car/utils/toast_util.dart';
-import 'package:fresh_car/view_model/cart_viewmodel.dart';
 import 'package:fresh_car/view_model/product_detail_viewmodel.dart';
 import 'package:fresh_car/view_model/user_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -137,6 +136,7 @@ class _ProductSelectDialogState extends State<ProductSelectDialog> {
                                   productModel: productDetailVM.productModel,
                                   quantity: productDetailVM.quantity,
                                   uid: _userViewModel.currentUser?.uid ?? '');
+                              ToastUtils.show(msg: 'Add to cart success');
                             } else {
                               ToastUtils.show(msg: 'please login');
                             }

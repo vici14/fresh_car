@@ -1,8 +1,11 @@
 import 'package:fresh_car/model/cart_model.dart';
+import 'package:fresh_car/model/ordered_product_model.dart';
 import 'package:fresh_car/model/product_model.dart';
 import 'package:fresh_car/repository/cart_repo_impl.dart';
 import 'package:fresh_car/repository/cart_repository.dart';
 import 'package:fresh_car/view_model/base_viewmodel.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CartViewModel extends BaseViewModel {
   final CartRepository _repository = CartRepositoryImplement();
@@ -56,5 +59,10 @@ class CartViewModel extends BaseViewModel {
       return true;
     }
     return false;
+  }
+
+  Stream<QuerySnapshot<OrderedProductModel>> getCartItemStream(
+      String uid) async* {
+    yield* _repository.getCartItemsStream(uid);
   }
 }

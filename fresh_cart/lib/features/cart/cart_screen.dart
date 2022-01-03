@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fresh_car/mock_data.dart';
 import 'package:fresh_car/model/cart_model.dart';
 import 'package:fresh_car/model/ordered_product_model.dart';
+import 'package:fresh_car/utils/currency_formatter.dart';
+import 'package:fresh_car/utils/string_util.dart';
 import 'package:fresh_car/utils/validation_util.dart';
 import 'package:fresh_car/view_model/cart_viewmodel.dart';
 import 'package:fresh_car/view_model/user_viewmodel.dart';
@@ -19,25 +21,22 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   double shipCost = 5000;
-  CartModel? cartModel;
   List<OrderedProductModel>? list;
-  final _cartStream =
-      FirebaseFirestore.instance.collection('cart').withConverter<CartModel>(
-          fromFirestore: (snapshots, _) {
-            return CartModel.fromQuerySnapshot(snapshots.data()!);
-          },
-          toFirestore: (cart, _) => cart.toJson());
   final _formKey = GlobalKey<FormState>();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   late CartViewModel _cartViewModel;
   late UserViewModel _userViewModel;
+  late Stream<QuerySnapshot<OrderedProductModel>> _stream;
 
   @override
   void initState() {
     _userViewModel = Provider.of<UserViewModel>(context, listen: false);
     _cartViewModel = Provider.of<CartViewModel>(context, listen: false);
+    _stream =
+        _cartViewModel.getCartItemStream(_userViewModel.currentUser?.uid ?? '');
+
     super.initState();
   }
 
@@ -79,28 +78,41 @@ class _CartScreenState extends State<CartScreen> {
                     right: 12,
                     top: 10,
                     bottom: MediaQuery.of(context).size.width * 0.12),
-                child: SingleChildScrollView(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Nhập tên và địa chỉ người nhận'),
-                    _buildInputForm(),
-                    Text("Chi tiết đơn hàng"),
-                    _buildProductsList(cartVM.currentCart?.orderedItems),
-                    // _buildTotal(cart),
-                    _buildSubmitButton(onTap: () async {
-                      bool isSuccess = await cartVM.checkOutCart(
-                        uid: userVM.currentUser?.uid ?? '',
-                        customerName: userVM.currentUser?.name ?? '',
-                        customerPhone: userVM.currentUser?.phone ?? '',
-                        customerAddress: userVM.currentUser?.address ?? '',
-                      );
-                      if (isSuccess) {
-                        userVM.refreshCurrentUser();
-                      }
-                    }),
-                  ],
-                )),
+                child: StreamBuilder(
+                  stream: _stream,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot<OrderedProductModel>> snap) {
+                    if (!snap.hasData) {
+                      return Text("no data");
+                    }
+                    List<OrderedProductModel> list = List.generate(
+                        snap.data!.docs.length,
+                        (index) => snap.data!.docs[index].data()).toList();
+                    return SingleChildScrollView(
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Nhập tên và địa chỉ người nhận'),
+                        _buildInputForm(),
+                        Text("Chi tiết đơn hàng"),
+                        _buildProductsList(list),
+                        _buildTotal(
+                            totalCost: StringUtil.calculateTotalCost(list)),
+                        _buildSubmitButton(onTap: () async {
+                          bool isSuccess = await cartVM.checkOutCart(
+                            uid: userVM.currentUser?.uid ?? '',
+                            customerName: userVM.currentUser?.name ?? '',
+                            customerPhone: userVM.currentUser?.phone ?? '',
+                            customerAddress: userVM.currentUser?.address ?? '',
+                          );
+                          if (isSuccess) {
+                            userVM.refreshCurrentUser();
+                          }
+                        }),
+                      ],
+                    ));
+                  },
+                ),
               );
             },
           );
@@ -109,11 +121,11 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildTotal(CartModel cart) {
+  Widget _buildTotal({required double totalCost}) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-          color: Colors.grey,
+          color: Colors.grey.withOpacity(0.6),
           borderRadius: BorderRadius.all(
             Radius.circular(12),
           )),
@@ -124,7 +136,8 @@ class _CartScreenState extends State<CartScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Tạm tính'),
-              Text(cart.totalPrice.toString()),
+              Text(CurrencyFormatter()
+                  .toDisplayValue(totalCost, currency: "VNĐ")),
             ],
           ),
           SizedBox(
@@ -144,7 +157,8 @@ class _CartScreenState extends State<CartScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Phí giao hàng'),
-              Text(shipCost.toString()),
+              Text(CurrencyFormatter()
+                  .toDisplayValue(shipCost, currency: "VNĐ")),
             ],
           ),
           SizedBox(
@@ -162,7 +176,8 @@ class _CartScreenState extends State<CartScreen> {
             children: [
               Text('Tổng cộng:'),
               Text(
-                (cart.totalPrice + shipCost).toString(),
+                CurrencyFormatter()
+                    .toDisplayValue((totalCost + shipCost), currency: "VNĐ"),
                 style: TextStyle(
                     color: Colors.red,
                     fontSize: 18,
@@ -334,7 +349,8 @@ class _CartScreenState extends State<CartScreen> {
                           textAlign: TextAlign.center,
                         ),
                         Text(
-                          item.cost.toString(),
+                          CurrencyFormatter()
+                              .toDisplayValue(item.cost, currency: "VNĐ"),
                           textAlign: TextAlign.end,
                         ),
                       ],

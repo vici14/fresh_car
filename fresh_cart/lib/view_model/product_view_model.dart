@@ -50,7 +50,6 @@ class ProductViewModel extends BaseViewModel {
   }
 
   void _updateLikeStatusInCategory({required ProductModel productModel}) {
-    ///use for like product at category
     switch (productModel.category) {
       case "meat":
         meatProductsAfterLoggedIn
@@ -92,6 +91,59 @@ class ProductViewModel extends BaseViewModel {
     productsAfterLoggedIn
         ?.firstWhere((element) => element.id == productModel.id)
         .isLiked = true;
+  }
+
+  void updateUnLikeStatus(ProductModel productModel) {
+    ///use when unlike product at home
+    _updateUnLikeStatusInCategory(productModel: productModel);
+    productsAfterLoggedIn
+        ?.firstWhere((element) => element.id == productModel.id)
+        .isLiked = false;
+    notifyListeners();
+  }
+
+  void _updateUnLikeStatusInCategory({required ProductModel productModel}) {
+    switch (productModel.category) {
+      case "meat":
+        meatProductsAfterLoggedIn
+            .firstWhere((element) => element.id == productModel.id)
+            .isLiked = false;
+        break;
+      case "vegetable":
+        vegetableProductsAfterLoggedIn
+            .firstWhere((element) => element.id == productModel.id)
+            .isLiked = false;
+        break;
+      case "house_ware":
+        houseWareProductsAfterLoggedIn
+            .firstWhere((element) => element.id == productModel.id)
+            .isLiked = false;
+        break;
+    }
+  }
+
+  void updateUnLikeStatusInCategory(ProductModel productModel) {
+    ///use for unlike product at category
+    switch (productModel.category) {
+      case "meat":
+        meatProductsAfterLoggedIn
+            .firstWhere((element) => element.id == productModel.id)
+            .isLiked = false;
+        break;
+      case "vegetable":
+        vegetableProductsAfterLoggedIn
+            .firstWhere((element) => element.id == productModel.id)
+            .isLiked = false;
+        break;
+      case "house_ware":
+        houseWareProductsAfterLoggedIn
+            .firstWhere((element) => element.id == productModel.id)
+            .isLiked = false;
+        break;
+    }
+    productsAfterLoggedIn
+        ?.firstWhere((element) => element.id == productModel.id)
+        .isLiked = false;
   }
 
   Future<bool> getProducts() async {

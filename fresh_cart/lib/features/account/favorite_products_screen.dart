@@ -14,6 +14,15 @@ class FavoriteProductsScreen extends StatefulWidget {
 }
 
 class _FavoriteProductsScreenState extends State<FavoriteProductsScreen> {
+  late UserViewModel _userViewModel;
+  @override
+  void initState() {
+    _userViewModel = Provider.of<UserViewModel>(context, listen: false)
+      ..refreshCurrentUser();
+    print('favorite screen init');
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

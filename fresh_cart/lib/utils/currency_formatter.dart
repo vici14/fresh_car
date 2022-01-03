@@ -13,6 +13,6 @@ class CurrencyFormatter {
     }
     return currency == null
         ? decimalFormat.format(value).split('.').first
-        : decimalFormat.format(value).split('.').first + currency;
+        : decimalFormat.format(value).split('.').first + " " + currency;
   }
 }

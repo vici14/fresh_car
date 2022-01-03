@@ -129,7 +129,7 @@ class _ProductCardItemState extends State<ProductCardItem> {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0, right: 8),
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       if (userVM.isLoggedIn) {
                         if (!product.isLiked) {
                           userVM.likeProduct(product.changeLikeStatus());
@@ -138,9 +138,12 @@ class _ProductCardItemState extends State<ProductCardItem> {
                               : productViewModel
                                   .updateLikeStatusInCategory(product);
                         } else {
-                          userVM.unlikeProduct(product);
+                          await userVM.unlikeProduct(product);
+                          widget.isFromHomeScreen
+                              ? productViewModel.updateUnLikeStatus(product)
+                              : productViewModel
+                                  .updateUnLikeStatusInCategory(product);
                         }
-                        // productViewModel.getProducts();
                       } else {
                         ToastUtils.show(msg: 'PLEASE LOGIN');
                       }

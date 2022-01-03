@@ -1,5 +1,7 @@
 import 'package:fresh_car/model/cart_model.dart';
 import 'package:fresh_car/model/product_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fresh_car/model/ordered_product_model.dart';
 
 abstract class CartRepository {
   Future<CartModel?> getCart(String uid);
@@ -22,4 +24,5 @@ abstract class CartRepository {
     required String customerPhone,
     required String customerAddress,
   });
+  Stream<QuerySnapshot<OrderedProductModel>> getCartItemsStream(String uid);
 }
