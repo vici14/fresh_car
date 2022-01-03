@@ -47,7 +47,11 @@ class CartViewModel extends BaseViewModel {
     required String customerName,
     required String customerPhone,
     required String customerAddress,
+    required List<OrderedProductModel> products,
+    required double totalCost,
   }) async {
+    currentCart!.totalCost = totalCost;
+    currentCart!.orderedItems = products;
     bool isSuccess = await _repository.checkOutCart(
         cartModel: currentCart!,
         uid: uid,

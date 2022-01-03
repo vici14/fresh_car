@@ -8,6 +8,7 @@ class CartModel {
   String? customerAddress;
   int? orderCheckoutTime;
   int? dateCreated;
+  double totalCost;
 
   CartModel({
     this.orderCheckoutTime,
@@ -17,6 +18,7 @@ class CartModel {
     this.customerPhone,
     this.customerAddress,
     this.note,
+    this.totalCost = 0,
   });
 
   // double get totalPrice {
@@ -29,12 +31,15 @@ class CartModel {
 
   factory CartModel.initial() {
     return CartModel(
-        orderedItems: [],
-        customerName: '',
-        customerPhone: '',
-        note: '',
-        dateCreated: DateTime.now().microsecondsSinceEpoch,
-        orderCheckoutTime: 0);
+      totalCost: 0,
+      customerAddress: '',
+      orderedItems: [],
+      customerName: '',
+      customerPhone: '',
+      note: '',
+      dateCreated: DateTime.now().microsecondsSinceEpoch,
+      orderCheckoutTime: 0,
+    );
   }
 
   factory CartModel.fromQuerySnapshot(Map<String, dynamic> snapshot) {
@@ -50,6 +55,7 @@ class CartModel {
               (index) => OrderedProductModel.fromQuerySnapshot(
                   snapshot['orderedItems'][index])).toList()
           : [],
+      totalCost: snapshot['totalCost'] ?? 0,
     );
   }
 
@@ -59,10 +65,12 @@ class CartModel {
     required String customerAddress,
   }) {
     return CartModel(
-      dateCreated: dateCreated,
+      dateCreated: this.dateCreated,
       customerPhone: customerPhone,
       customerName: customerName,
       orderedItems: this.orderedItems,
+      customerAddress: customerAddress,
+      totalCost: this.totalCost,
       note: this.note,
       orderCheckoutTime: DateTime.now().millisecondsSinceEpoch,
     );
@@ -70,6 +78,7 @@ class CartModel {
 
   Map<String, dynamic> toJson() {
     return {
+      'totalCost': totalCost,
       'orderedItems': List.generate(
           orderedItems!.length, (index) => orderedItems![index].toJson()),
       'note': note,

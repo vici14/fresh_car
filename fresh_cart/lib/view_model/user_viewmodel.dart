@@ -24,6 +24,7 @@ class UserViewModel extends BaseViewModel {
 
   UserModel? currentUser;
   bool isLoggedIn = false;
+  bool isUpdatingProfile = false;
 
   //=======================FIELD VALUE=========================
 
@@ -56,6 +57,7 @@ class UserViewModel extends BaseViewModel {
         isLoggedIn = true;
       }
       notifyListeners();
+
       return _resp;
     } catch (e) {
       print(e.toString());
@@ -72,6 +74,8 @@ class UserViewModel extends BaseViewModel {
       {required String name,
       required String phone,
       required String address}) async {
+    isUpdatingProfile = true;
+    notifyListeners();
     var _resp = await _repository.updateProfile(
         name: name,
         phone: phone,
@@ -80,6 +84,8 @@ class UserViewModel extends BaseViewModel {
     if (_resp) {
       refreshCurrentUser();
     }
+    isUpdatingProfile = false;
+    notifyListeners();
   }
 
   Future<bool> logOut() async {

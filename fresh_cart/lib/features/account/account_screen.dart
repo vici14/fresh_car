@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fresh_car/mock_data.dart';
-import 'package:fresh_car/model/cart_model.dart';
-import 'package:fresh_car/model/ordered_product_model.dart';
-import 'package:fresh_car/model/product_model.dart';
-import 'package:fresh_car/model/user_model.dart';
 import 'package:fresh_car/utils/validation_util.dart';
 import 'package:fresh_car/view_model/product_view_model.dart';
 import 'package:fresh_car/view_model/user_viewmodel.dart';
 import 'package:fresh_car/widgets/my_app_bar.dart';
 import 'package:fresh_car/widgets/my_drawer.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 
 class CustomerProfileScreen extends StatefulWidget {
@@ -26,11 +19,22 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   ProductViewModel? _productViewModel;
+  bool canUpdateProfile = false;
+  late UserViewModel _userViewModel;
+  @override
+  void initState() {
+    _userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    if (_userViewModel.currentUser != null) {
+      canUpdateProfile = true;
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     _productViewModel = Provider.of<ProductViewModel>(context, listen: false);
-    String email = 'cuongchau16@gmail.com';
+    String email = 'cuongchau17@gmail.com';
     String password = '123456789';
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -55,6 +59,8 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                     }),
                     _buildSignInButton(
                       onTap: () async {
+                        canUpdateProfile = true;
+
                         var _resp = await userVM.signInWithEmailAndPassword(
                             email: email, password: password);
                         if (_resp) {
@@ -110,10 +116,11 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   Widget _buildInputForm() {
     return Consumer<UserViewModel>(
       builder: (BuildContext context, UserViewModel userVM, Widget? child) {
-        if (userVM.isLoggedIn && userVM.currentUser != null) {
-          _phoneController.text = userVM.currentUser?.phone ?? '';
-          _nameController.text = userVM.currentUser?.name ?? '';
-          _addressController.text = userVM.currentUser?.address ?? '';
+        if (userVM.isLoggedIn && canUpdateProfile) {
+          _phoneController.text = userVM.currentUser!.phone!;
+          _nameController.text = userVM.currentUser!.name!;
+          _addressController.text = userVM.currentUser!.address!;
+          canUpdateProfile = false;
         }
         return Form(
             key: _formKey,
@@ -176,12 +183,15 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                 ),
                 _buildCustomButton(
                     onTap: () {
+                      canUpdateProfile = true;
                       if (isValidate()) {
                         userVM.updateProfile(
                             name: _nameController.text,
                             phone: _phoneController.text,
                             address: _addressController.text);
                       }
+                      canUpdateProfile = false;
+                      setState(() {});
                     },
                     title: "Cập nhật thông tin"),
               ],
@@ -234,21 +244,29 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
 
   Widget _buildCustomButton(
       {required String title, required Function()? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.only(top: 15, bottom: 15),
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-            color: Colors.green, borderRadius: BorderRadius.circular(12)),
-        height: 52,
-        child: Center(
-          child: Text(
-            title,
-            style: TextStyle(color: Colors.white, fontSize: 16),
+    return Consumer<UserViewModel>(
+      builder: (BuildContext context, UserViewModel userVM, Widget? child) {
+        return GestureDetector(
+          onTap: onTap,
+          child: Container(
+            margin: EdgeInsets.only(top: 15, bottom: 15),
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+                color: Colors.green, borderRadius: BorderRadius.circular(12)),
+            height: 52,
+            child: Center(
+              child: (userVM.isUpdatingProfile)
+                  ? CircularProgressIndicator(
+                      color: Colors.white,
+                    )
+                  : Text(
+                      title,
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

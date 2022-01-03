@@ -232,9 +232,9 @@ class ServiceManager {
     try {
       var _currentUser = await getCurrentUserDocument(uid);
       _currentUser
-          .update({'name': name, 'phone': phone, 'address': address})
-          .then((value) => true)
-          .onError((error, stackTrace) => false);
+          .update({'name': name, 'phone': phone, 'address': address}).onError(
+              (error, stackTrace) => false);
+      return true;
     } catch (e) {
       print('updateProfile:${e.toString()}');
     }
@@ -305,9 +305,15 @@ class ServiceManager {
   }) async {
     try {
       var _cart = await getUserCurrentCart(uid);
-      await _cart
-          .update(CartModel.initial().toJson())
-          .onError((error, stackTrace) => false);
+      _cart
+          .collection('orderedItems')
+          .get()
+          .then((value) => value.docs.forEach((element) {
+                element.reference.delete();
+              }));
+      // await _cart
+      //     .update(CartModel.initial().toJson())
+      //     .onError((error, stackTrace) => false);
       await addToHistory(
               uid: uid,
               cartModel: cartModel,

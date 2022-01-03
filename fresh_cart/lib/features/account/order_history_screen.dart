@@ -67,7 +67,7 @@ class OrderHistoryScreen extends StatelessWidget {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [Text('Địa chỉ:'), Text(cartModel.customerName ?? '')],
+            children: [Text('Địa chỉ:'), Text(cartModel.customerAddress ?? '')],
           ),
           Divider(
             color: Colors.black,
@@ -78,8 +78,8 @@ class OrderHistoryScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Tổng đơn hàng'),
-              // Text(CurrencyFormatter()
-              //     .toDisplayValue(cartModel.totalPrice, currency: 'VNĐ'))
+              Text(CurrencyFormatter()
+                  .toDisplayValue(cartModel.totalCost, currency: 'VNĐ'))
             ],
           ),
         ],

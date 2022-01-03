@@ -20,7 +20,7 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  double shipCost = 5000;
+  double shipCost = 0;
   List<OrderedProductModel>? list;
   final _formKey = GlobalKey<FormState>();
   TextEditingController _nameController = TextEditingController();
@@ -100,10 +100,12 @@ class _CartScreenState extends State<CartScreen> {
                             totalCost: StringUtil.calculateTotalCost(list)),
                         _buildSubmitButton(onTap: () async {
                           bool isSuccess = await cartVM.checkOutCart(
+                            totalCost: StringUtil.calculateTotalCost(list),
+                            products: list,
                             uid: userVM.currentUser?.uid ?? '',
-                            customerName: userVM.currentUser?.name ?? '',
-                            customerPhone: userVM.currentUser?.phone ?? '',
-                            customerAddress: userVM.currentUser?.address ?? '',
+                            customerName: _nameController.text,
+                            customerPhone: _phoneController.text,
+                            customerAddress: _addressController.text,
                           );
                           if (isSuccess) {
                             userVM.refreshCurrentUser();
