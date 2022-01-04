@@ -21,6 +21,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   ProductViewModel? _productViewModel;
   bool canUpdateProfile = false;
   late UserViewModel _userViewModel;
+
   @override
   void initState() {
     _userViewModel = Provider.of<UserViewModel>(context, listen: false);
@@ -34,7 +35,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   @override
   Widget build(BuildContext context) {
     _productViewModel = Provider.of<ProductViewModel>(context, listen: false);
-    String email = 'cuongchau17@gmail.com';
+    String email = 'cuongchau18@gmail.com';
     String password = '123456789';
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -205,40 +206,58 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   }
 
   Widget _buildRegisterButton({required Function()? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.only(top: 15, bottom: 15),
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-            color: Colors.green, borderRadius: BorderRadius.circular(12)),
-        height: 52,
-        child: Center(
-          child: Text(
-            "Đăng kí ",
-            style: TextStyle(color: Colors.white, fontSize: 16),
+    return Consumer(
+      builder: (BuildContext context, UserViewModel userVM, Widget? child) {
+        return GestureDetector(
+          onTap: onTap,
+          child: Container(
+            margin: EdgeInsets.only(top: 15, bottom: 15),
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+                color: Colors.green, borderRadius: BorderRadius.circular(12)),
+            height: 52,
+            child: Center(
+              child: userVM.isSigningUp
+                  ? CircularProgressIndicator(
+                      color: Colors.white,
+                    )
+                  : Text(
+                      "Đăng kí ",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
   Widget _buildSignInButton({required Function()? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.only(top: 15, bottom: 15),
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-            color: Colors.green, borderRadius: BorderRadius.circular(12)),
-        height: 52,
-        child: Center(
-          child: Text(
-            "Đăng Nhập",
-            style: TextStyle(color: Colors.white, fontSize: 16),
+    return Consumer(
+      builder: (BuildContext context, UserViewModel userVM, Widget? child) {
+        return GestureDetector(
+          onTap: onTap,
+          child: Container(
+            margin: EdgeInsets.only(top: 15, bottom: 15),
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+                color: Colors.green, borderRadius: BorderRadius.circular(12)),
+            height: 52,
+            child: userVM.isLoggingIn
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  )
+                : Center(
+                    child: Text(
+                      "Đăng Nhập",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

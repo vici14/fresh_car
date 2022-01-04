@@ -23,6 +23,9 @@ class UserViewModel extends BaseViewModel {
   //=======================FIELD VALUE=========================
 
   UserModel? currentUser;
+  bool isSigningUp = false;
+  bool isLoggingIn = false;
+
   bool isLoggedIn = false;
   bool isUpdatingProfile = false;
 
@@ -30,8 +33,18 @@ class UserViewModel extends BaseViewModel {
 
   Future<bool> signUpWithEmailAndPassword(
       {required String email, required String password}) async {
-    return await _repository.signUpWithEmailAndPassword(
-        email: email, password: password);
+    try {
+      isSigningUp = true;
+      notifyListeners();
+      var _resp = await _repository.signUpWithEmailAndPassword(
+          email: email, password: password);
+      isSigningUp = false;
+      notifyListeners();
+      return _resp;
+    } catch (e) {
+      print('signUpWithEmailAndPassword: ${e.toString()}');
+    }
+    return false;
   }
 
   Future<void> likeProduct(ProductModel productModel) async {
@@ -49,18 +62,21 @@ class UserViewModel extends BaseViewModel {
   Future<bool> signInWithEmailAndPassword(
       {required String email, required String password}) async {
     try {
+      isLoggingIn = true;
       isLoggedIn = false;
+      notifyListeners();
       var _resp = await _repository.signInWithEmailAndPassword(
           email: email, password: password);
       if (_resp) {
         currentUser = await _repository.getCurrentUser();
         isLoggedIn = true;
       }
+      isLoggingIn = false;
       notifyListeners();
 
       return _resp;
     } catch (e) {
-      print(e.toString());
+      print('signInWithEmailAndPassword:${e.toString()}');
     }
     return false;
   }
