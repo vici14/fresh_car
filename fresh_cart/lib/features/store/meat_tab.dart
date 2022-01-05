@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_car/features/store/base_product_category_screen.dart';
 import 'package:fresh_car/model/product_model.dart';
-import 'package:fresh_car/view_model/product_view_model.dart';
 import 'package:fresh_car/widgets/ProductCardItem.dart';
-import 'package:provider/provider.dart';
+
+import '../../mock_data.dart';
 
 class MeatTab extends StatefulWidget {
   @override
@@ -12,51 +12,22 @@ class MeatTab extends StatefulWidget {
 
 class _MeatTabState extends BaseProductCategoryScreen<MeatTab> {
   @override
-  void initState() {
-    super.getProductByCategory('meat');
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Consumer<ProductViewModel>(
-      builder:
-          (BuildContext context, ProductViewModel productVM, Widget? child) {
-        if (productVM.isLoadingMeat) {
-          return Center(
-            child: CircularProgressIndicator(),
+    return GridView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 200.0,
+          mainAxisSpacing: 10.0,
+          crossAxisSpacing: 10.0,
+          childAspectRatio: 1,
+        ),
+        itemCount: listProducts.length,
+        itemBuilder: (context, index) {
+          ProductModel product = listProducts[index];
+          return ProductCardItem(
+            productModel: product,
+            isFromHomeScreen: false,
           );
-        }
-        if (productVM.meatProducts.isEmpty) {
-          return Center(
-            child: Text("Danh sách trống"),
-          );
-        }
-        return GridView.builder(
-            padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 200.0,
-              mainAxisSpacing: 10.0,
-              crossAxisSpacing: 10.0,
-              childAspectRatio: 1,
-            ),
-            itemCount: super.userVM.isLoggedIn
-                ? productVM.meatProductsAfterLoggedIn.length
-                : productVM.meatProducts.length,
-            itemBuilder: (context, index) {
-              ProductModel product;
-
-              if (super.userVM.isLoggedIn) {
-                product = super.productVM.meatProductsAfterLoggedIn[index];
-              } else {
-                product = super.productVM.meatProducts[index];
-              }
-              return ProductCardItem(
-                productModel: product,
-                isFromHomeScreen: false,
-              );
-            });
-      },
-    );
+        });
   }
 }

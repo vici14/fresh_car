@@ -6,9 +6,9 @@ import 'package:fresh_car/widgets/my_app_bar.dart';
 import 'package:fresh_car/widgets/my_drawer.dart';
 
 class StoreScreen extends StatefulWidget {
-  final GlobalKey<ScaffoldState>? globalScaffoldKey;
-
-  const StoreScreen({Key? key, this.globalScaffoldKey}) : super(key: key);
+  const StoreScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<StoreScreen> createState() {
