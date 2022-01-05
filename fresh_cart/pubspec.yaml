@@ -35,6 +35,8 @@ dev_dependencies:
   firebase_auth: ^3.3.4
   provider: ^6.0.1
   fluttertoast: ^8.0.2
+  intl: ^0.17.0
+
 
 
   flutter_test:

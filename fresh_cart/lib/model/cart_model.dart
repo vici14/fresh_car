@@ -56,6 +56,8 @@ class CartModel {
                   snapshot['orderedItems'][index])).toList()
           : [],
       totalCost: snapshot['totalCost'] ?? 0,
+      orderCheckoutTime: snapshot['orderCheckoutTime'] ?? 0,
+      dateCreated: snapshot['dateCreated'] ?? 0,
     );
   }
 
@@ -72,7 +74,7 @@ class CartModel {
       customerAddress: customerAddress,
       totalCost: this.totalCost,
       note: this.note,
-      orderCheckoutTime: DateTime.now().millisecondsSinceEpoch,
+      orderCheckoutTime: DateTime.now().microsecondsSinceEpoch,
     );
   }
 
@@ -85,6 +87,8 @@ class CartModel {
       'customerName': customerName,
       'customerPhone': customerPhone,
       'customerAddress': customerAddress,
+      'orderCheckoutTime': orderCheckoutTime,
+      'dateCreated': dateCreated
     };
   }
 }

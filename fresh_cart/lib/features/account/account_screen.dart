@@ -35,7 +35,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   @override
   Widget build(BuildContext context) {
     _productViewModel = Provider.of<ProductViewModel>(context, listen: false);
-    String email = 'cuongchau18@gmail.com';
+    String email = 'cuongchau19@gmail.com';
     String password = '123456789';
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),

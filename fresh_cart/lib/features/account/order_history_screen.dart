@@ -5,6 +5,7 @@ import 'package:fresh_car/view_model/user_viewmodel.dart';
 import 'package:fresh_car/widgets/my_app_bar.dart';
 import 'package:fresh_car/widgets/my_drawer.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class OrderHistoryScreen extends StatelessWidget {
   @override
@@ -15,7 +16,8 @@ class OrderHistoryScreen extends StatelessWidget {
         title: "Lịch sử đơn hàng",
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        // padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        padding: EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 20),
         child: Consumer<UserViewModel>(
           builder: (BuildContext context, UserViewModel userVM, Widget? child) {
             if (!userVM.isLoggedIn) {
@@ -80,6 +82,14 @@ class OrderHistoryScreen extends StatelessWidget {
               Text('Tổng đơn hàng'),
               Text(CurrencyFormatter()
                   .toDisplayValue(cartModel.totalCost, currency: 'VNĐ'))
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Ngày thanh toán:'),
+              Text(DateFormat("yMd").format(DateTime.fromMicrosecondsSinceEpoch(
+                  cartModel.orderCheckoutTime ?? 0))),
             ],
           ),
         ],
