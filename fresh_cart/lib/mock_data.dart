@@ -2,7 +2,7 @@ import 'package:fresh_car/model/product_model.dart';
 
 final List<String> homeCars = [];
 
-final List<ProductModel> listCars = [
+final List<ProductModel> listProducts = [
   ProductModel(
       id: '1',
       imageUrl:

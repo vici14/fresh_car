@@ -1,15 +1,11 @@
 import 'package:fresh_car/model/cart_model.dart';
 import 'package:fresh_car/model/ordered_product_model.dart';
 import 'package:fresh_car/model/product_model.dart';
-import 'package:fresh_car/repository/cart_repo_impl.dart';
-import 'package:fresh_car/repository/cart_repository.dart';
 import 'package:fresh_car/view_model/base_viewmodel.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class CartViewModel extends BaseViewModel {
-  final CartRepository _repository = CartRepositoryImplement();
-
+  ///CartViewModel in this asm2's scope will mainly manage CartModel with
+  ///such functions like addToCart, deleteFromCart, save shipping info
   static late CartViewModel _instance;
 
   CartViewModel._internal();
@@ -23,50 +19,32 @@ class CartViewModel extends BaseViewModel {
   }
 
 //=======================FIELD VALUE=========================
+  ///cart have list orderedItems in asm2,asm3 list orderedItems is a
+  ///collection
   CartModel? currentCart;
   bool isGetCart = false;
 
-  void addToCart(
-      {required ProductModel productModel,
-      required int quantity,
-      required String uid}) {
-    _repository.addToCart(
-        quantity: quantity, uid: uid, productModel: productModel);
+  void initialCart() {
+    currentCart = CartModel.initial();
+
+    ///create cart
   }
 
-  void getCart(String uid) async {
-    isGetCart = true;
-    notifyListeners();
-    currentCart = await _repository.getCart(uid);
-    isGetCart = false;
-    notifyListeners();
-  }
-
-  Future<bool> checkOutCart({
-    required String uid,
-    required String customerName,
-    required String customerPhone,
-    required String customerAddress,
-    required List<OrderedProductModel> products,
-    required double totalCost,
-  }) async {
-    currentCart!.totalCost = totalCost;
-    currentCart!.orderedItems = products;
-    bool isSuccess = await _repository.checkOutCart(
-        cartModel: currentCart!,
-        uid: uid,
-        customerName: customerName,
-        customerPhone: customerPhone,
-        customerAddress: customerAddress);
-    if (isSuccess) {
-      getCart(uid);
-      return true;
+  void addToCart({
+    required ProductModel productModel,
+    required int quantity,
+  }) {
+    if (currentCart != null) {
+      currentCart!.orderedItems!.add(OrderedProductModel.fromProductModel(
+          product: productModel, quantity: quantity));
     }
-    return false;
+
+    /// implement addToCart
+    /// same products will increase  quantity
   }
 
-  Stream<QuerySnapshot<OrderedProductModel>> getCartItemStream(
-      String uid) async* {
-    yield* _repository.getCartItemsStream(uid);
+  void deleteFromCart() {
+    ///implement delete products from cart
+    ///products with quantity = 0 will be remove from cart
   }
 }

@@ -1,10 +1,9 @@
 import 'package:fresh_car/model/product_model.dart';
-import 'package:fresh_car/repository/cart_repo_impl.dart';
-import 'package:fresh_car/repository/cart_repository.dart';
 import 'package:fresh_car/view_model/base_viewmodel.dart';
 
 class ProductDetailViewModel extends BaseViewModel {
-  CartRepository _repository = CartRepositoryImplement();
+  ///when user click on cardProductItem we will create a
+  ///ProductDetailViewModel to manage UI's data such as quantity, product
   final ProductModel productModel;
 
   ProductDetailViewModel(this.productModel);
@@ -12,31 +11,14 @@ class ProductDetailViewModel extends BaseViewModel {
   int quantity = 1;
 
   increaseQuantity() {
-    quantity += 1;
-    notifyListeners();
+    ///implement increaseQuantity
   }
 
   decreaseQuantity() {
-    if (quantity > 0) {
-      quantity -= 1;
-    }
-    notifyListeners();
+    ///implement decreaseQuantity
   }
 
   double get totalCost {
-    if (quantity > 1) {
-      return productModel.cost * quantity;
-    } else if (quantity == 0) {
-      return 0;
-    }
-    return productModel.cost;
-  }
-
-  void addToCart(
-      {required ProductModel productModel,
-      required int quantity,
-      required String uid}) {
-    _repository.addToCart(
-        quantity: quantity, uid: uid, productModel: productModel);
+    return quantity * productModel.cost;
   }
 }

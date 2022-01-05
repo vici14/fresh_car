@@ -22,11 +22,6 @@ class _MeatTabState extends BaseProductCategoryScreen<MeatTab> {
     return Consumer<ProductViewModel>(
       builder:
           (BuildContext context, ProductViewModel productVM, Widget? child) {
-        if (productVM.isLoadingMeat) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
         if (productVM.meatProducts.isEmpty) {
           return Center(
             child: Text("Danh sách trống"),
@@ -40,17 +35,10 @@ class _MeatTabState extends BaseProductCategoryScreen<MeatTab> {
               crossAxisSpacing: 10.0,
               childAspectRatio: 1,
             ),
-            itemCount: super.userVM.isLoggedIn
-                ? productVM.meatProductsAfterLoggedIn.length
-                : productVM.meatProducts.length,
+            itemCount: productVM.meatProducts.length,
             itemBuilder: (context, index) {
               ProductModel product;
-
-              if (super.userVM.isLoggedIn) {
-                product = super.productVM.meatProductsAfterLoggedIn[index];
-              } else {
-                product = super.productVM.meatProducts[index];
-              }
+              product = super.productVM.meatProducts[index];
               return ProductCardItem(
                 productModel: product,
                 isFromHomeScreen: false,

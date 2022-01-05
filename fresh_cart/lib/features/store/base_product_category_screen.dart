@@ -1,13 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:fresh_car/view_model/product_view_model.dart';
-import 'package:fresh_car/view_model/user_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 abstract class BaseProductCategoryScreen<T extends StatefulWidget>
     extends State<T> {
-  UserViewModel get userVM =>
-      Provider.of<UserViewModel>(context, listen: false);
-
   ProductViewModel get productVM =>
       Provider.of<ProductViewModel>(context, listen: false);
 

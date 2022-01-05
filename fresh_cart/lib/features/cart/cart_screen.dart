@@ -6,7 +6,6 @@ import 'package:fresh_car/utils/currency_formatter.dart';
 import 'package:fresh_car/utils/string_util.dart';
 import 'package:fresh_car/utils/validation_util.dart';
 import 'package:fresh_car/view_model/cart_viewmodel.dart';
-import 'package:fresh_car/view_model/user_viewmodel.dart';
 import 'package:fresh_car/widgets/my_app_bar.dart';
 import 'package:fresh_car/widgets/my_drawer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,29 +26,12 @@ class _CartScreenState extends State<CartScreen> {
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   late CartViewModel _cartViewModel;
-  late UserViewModel _userViewModel;
-  Stream<QuerySnapshot<OrderedProductModel>>? _stream;
 
   @override
   void initState() {
-    _userViewModel = Provider.of<UserViewModel>(context, listen: false);
     _cartViewModel = Provider.of<CartViewModel>(context, listen: false);
-    _stream = _cartViewModel
-        .getCartItemStream(_userViewModel.currentUser?.uid ??
-            ''
-                '')
-        .asBroadcastStream();
 
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    if (_userViewModel.isLoggedIn) {
-      _cartViewModel.getCart(_userViewModel.currentUser?.uid ?? '');
-    }
-
-    super.didChangeDependencies();
   }
 
   @override
@@ -62,16 +44,6 @@ class _CartScreenState extends State<CartScreen> {
         ),
         body: Consumer<CartViewModel>(
           builder: (BuildContext context, CartViewModel cartVM, Widget? child) {
-            if (!_userViewModel.isLoggedIn) {
-              return Center(
-                child: Text('Vui lòng đăng nhập'),
-              );
-            }
-            if (cartVM.isGetCart) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
             return Container(
               padding: EdgeInsets.only(
                   left: 12,
@@ -79,50 +51,19 @@ class _CartScreenState extends State<CartScreen> {
                   top: 10,
                   bottom: MediaQuery.of(context).size.width * 0.12),
               child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                     Text('Nhập tên và địa chỉ người nhận'),
                     _buildInputForm(),
                     Text("Chi tiết đơn hàng"),
-                    StreamBuilder(
-                      stream: _stream,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<QuerySnapshot<OrderedProductModel>>
-                              snap) {
-                        if (!snap.hasData) {
-                          return Center(child: Text("Empty Cart"));
-                        }
-
-                        List<OrderedProductModel> list = List.generate(
-                            snap.data!.docs.length,
-                            (index) => snap.data!.docs[index].data()).toList();
-                        return Column(
-                          children: [
-                            _buildProductsList(list),
-                            _buildTotal(
-                                totalCost: StringUtil.calculateTotalCost(list)),
-                            _buildSubmitButton(onTap: () async {
-                              bool isSuccess = await cartVM.checkOutCart(
-                                totalCost: StringUtil.calculateTotalCost(list),
-                                products: list,
-                                uid: _userViewModel.currentUser?.uid ?? '',
-                                customerName: _nameController.text,
-                                customerPhone: _phoneController.text,
-                                customerAddress: _addressController.text,
-                              );
-                              if (isSuccess) {
-                                _userViewModel.refreshCurrentUser();
-                              }
-                            }),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
+                    _buildProductsList(cartVM.currentCart!.orderedItems),
+                    _buildTotal(
+                        totalCost: StringUtil.calculateTotalCost(
+                            cartVM.currentCart!.orderedItems!)),
+                    _buildSubmitButton(onTap: () async {}),
+                  ])),
             );
           },
         ));
@@ -217,86 +158,77 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildInputForm() {
-    return Consumer<UserViewModel>(
-      builder: (BuildContext context, UserViewModel userVM, Widget? child) {
-        if (userVM.isLoggedIn && userVM.currentUser != null) {
-          _phoneController.text = userVM.currentUser?.phone ?? '';
-          _nameController.text = userVM.currentUser?.name ?? '';
-          _addressController.text = userVM.currentUser?.address ?? '';
-        }
-        return Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(12),
-                      ),
-                      border: Border.all(width: 1, color: Colors.green)),
-                  child: TextFormField(
-                    validator: (val) => ValidationUtil.isNotNullOrEmpty(val),
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 5),
-                        hintText: "Họ và tên ",
-                        border: InputBorder.none),
+    return Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
                   ),
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(12),
-                      ),
-                      border: Border.all(width: 1, color: Colors.green)),
-                  child: TextFormField(
-                    validator: (val) => ValidationUtil.isNotNullOrEmpty(val),
-                    controller: _phoneController,
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 5),
-                        hintText: "Số điện thoại ",
-                        border: InputBorder.none),
+                  border: Border.all(width: 1, color: Colors.green)),
+              child: TextFormField(
+                validator: (val) => ValidationUtil.isNotNullOrEmpty(val),
+                controller: _nameController,
+                decoration: InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 5),
+                    hintText: "Họ và tên ",
+                    border: InputBorder.none),
+              ),
+            ),
+            SizedBox(
+              height: 12,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
                   ),
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(12),
-                      ),
-                      border: Border.all(width: 1, color: Colors.green)),
-                  child: TextFormField(
-                    controller: _addressController,
-                    validator: (val) => ValidationUtil.isNotNullOrEmpty(val),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 5),
-                        hintText: "Địa chỉ người nhận ",
-                        border: InputBorder.none),
+                  border: Border.all(width: 1, color: Colors.green)),
+              child: TextFormField(
+                validator: (val) => ValidationUtil.isNotNullOrEmpty(val),
+                controller: _phoneController,
+                decoration: InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 5),
+                    hintText: "Số điện thoại ",
+                    border: InputBorder.none),
+              ),
+            ),
+            SizedBox(
+              height: 12,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
                   ),
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                // _buildCustomButton(
-                //     onTap: () {
-                //       if (isValidate()) {
-                //         userVM.updateProfile(
-                //             name: _nameController.text,
-                //             phone: _phoneController.text,
-                //             address: _addressController.text);
-                //       }
-                //     },
-                //     title: "Cập nhật thông tin"),
-              ],
-            ));
-      },
-    );
+                  border: Border.all(width: 1, color: Colors.green)),
+              child: TextFormField(
+                controller: _addressController,
+                validator: (val) => ValidationUtil.isNotNullOrEmpty(val),
+                decoration: InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 5),
+                    hintText: "Địa chỉ người nhận ",
+                    border: InputBorder.none),
+              ),
+            ),
+            SizedBox(
+              height: 12,
+            ),
+            // _buildCustomButton(
+            //     onTap: () {
+            //       if (isValidate()) {
+            //         userVM.updateProfile(
+            //             name: _nameController.text,
+            //             phone: _phoneController.text,
+            //             address: _addressController.text);
+            //       }
+            //     },
+            //     title: "Cập nhật thông tin"),
+          ],
+        ));
   }
 
   Widget _buildProductsList(List<OrderedProductModel>? items) {

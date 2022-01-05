@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fresh_car/fresh_car_home_screen.dart';
-import 'package:fresh_car/service/service_manager.dart';
 import 'package:fresh_car/view_model/cart_viewmodel.dart';
 import 'package:fresh_car/view_model/product_view_model.dart';
-import 'package:fresh_car/view_model/user_viewmodel.dart';
 import 'package:fresh_car/widgets/my_drawer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -43,10 +41,9 @@ class _FreshCarState extends State<FreshCar> {
           providers: [
             ChangeNotifierProvider<ProductViewModel>(
                 create: (BuildContext context) => ProductViewModel.instance()),
-            ChangeNotifierProvider<UserViewModel>(
-                create: (BuildContext context) => UserViewModel.instance()),
             ChangeNotifierProvider<CartViewModel>(
-                create: (BuildContext context) => CartViewModel.instance()),
+                create: (BuildContext context) =>
+                    CartViewModel.instance()..initialCart()),
           ],
           child: MaterialApp(
             home: Scaffold(
@@ -60,9 +57,7 @@ class _FreshCarState extends State<FreshCar> {
   }
 
   Future<bool> initDependencies() async {
-    ServiceManager().init();
     ProductViewModel.initial();
-    UserViewModel.initial();
     CartViewModel.initial();
     await Future.delayed(
       Duration(seconds: 1),

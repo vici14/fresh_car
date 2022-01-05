@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fresh_car/model/product_model.dart';
 import 'package:fresh_car/utils/currency_formatter.dart';
 import 'package:fresh_car/utils/toast_util.dart';
+import 'package:fresh_car/view_model/cart_viewmodel.dart';
 import 'package:fresh_car/view_model/product_detail_viewmodel.dart';
-import 'package:fresh_car/view_model/user_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 class ProductSelectDialog extends StatefulWidget {
@@ -20,12 +20,10 @@ class ProductSelectDialog extends StatefulWidget {
 
 class _ProductSelectDialogState extends State<ProductSelectDialog> {
   late ProductDetailViewModel _productDetailViewModel;
-  late UserViewModel _userViewModel;
 
   @override
   void initState() {
     _productDetailViewModel = ProductDetailViewModel(widget.productModel);
-    _userViewModel = Provider.of<UserViewModel>(context, listen: false);
     super.initState();
   }
 
@@ -129,33 +127,32 @@ class _ProductSelectDialogState extends State<ProductSelectDialog> {
                                 icon: Icon(Icons.add))
                           ],
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            if (_userViewModel.isLoggedIn) {
-                              productDetailVM.addToCart(
-                                  productModel: productDetailVM.productModel,
-                                  quantity: productDetailVM.quantity,
-                                  uid: _userViewModel.currentUser?.uid ?? '');
-                              ToastUtils.show(msg: 'Add to cart success');
-                            } else {
-                              ToastUtils.show(msg: 'please login');
-                            }
-                            Navigator.of(context).pop();
+                        Consumer<CartViewModel>(
+                          builder: (BuildContext context, CartViewModel cartVM,
+                              Widget? child) {
+                            return GestureDetector(
+                              onTap: () {
+                                cartVM.addToCart(
+                                    productModel: productDetailVM.productModel,
+                                    quantity: productDetailVM.quantity);
+                                Navigator.of(context).pop();
+                              },
+                              child: Container(
+                                  padding: EdgeInsets.symmetric(vertical: 10),
+                                  decoration: BoxDecoration(
+                                      color: Colors.teal,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(12))),
+                                  width: 100,
+                                  child: Center(
+                                      child: Text(
+                                    CurrencyFormatter().toDisplayValue(
+                                        productDetailVM.totalCost,
+                                        currency: 'VNĐ'),
+                                    style: TextStyle(color: Colors.white),
+                                  ))),
+                            );
                           },
-                          child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              decoration: BoxDecoration(
-                                  color: Colors.teal,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12))),
-                              width: 100,
-                              child: Center(
-                                  child: Text(
-                                CurrencyFormatter().toDisplayValue(
-                                    productDetailVM.totalCost,
-                                    currency: 'VNĐ'),
-                                style: TextStyle(color: Colors.white),
-                              ))),
                         )
                       ],
                     )

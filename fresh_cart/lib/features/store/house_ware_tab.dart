@@ -22,11 +22,6 @@ class _HouseWareTabState extends BaseProductCategoryScreen<HouseWareTab> {
     return Consumer<ProductViewModel>(
       builder:
           (BuildContext context, ProductViewModel productVM, Widget? child) {
-        if (productVM.isLoadingHouseWare) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
         if (productVM.houseWareProducts.isEmpty) {
           return Center(
             child: Text("Danh sách trống"),
@@ -40,17 +35,9 @@ class _HouseWareTabState extends BaseProductCategoryScreen<HouseWareTab> {
               crossAxisSpacing: 10.0,
               childAspectRatio: 1,
             ),
-            itemCount: super.userVM.isLoggedIn
-                ? productVM.houseWareProductsAfterLoggedIn.length
-                : productVM.houseWareProducts.length,
+            itemCount: productVM.houseWareProducts.length,
             itemBuilder: (context, index) {
-              ProductModel product;
-
-              if (super.userVM.isLoggedIn) {
-                product = super.productVM.houseWareProductsAfterLoggedIn[index];
-              } else {
-                product = super.productVM.houseWareProducts[index];
-              }
+              ProductModel product = super.productVM.houseWareProducts[index];
               return ProductCardItem(
                 productModel: product,
                 isFromHomeScreen: false,

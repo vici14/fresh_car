@@ -29,23 +29,6 @@ class OrderedProductModel {
         description: '');
   }
 
-  factory OrderedProductModel.fromQuerySnapshot(Map<String, dynamic> snapshot) {
-    return OrderedProductModel(
-      id: snapshot['id'],
-      category: snapshot['category'],
-      cost: snapshot['cost'] != null
-          ? double.parse(snapshot['cost'].toString())
-          : 0,
-      description: snapshot['description'] != null
-          ? snapshot['description'] as String
-          : '',
-      imageUrl:
-          snapshot['imageUrl'] != null ? snapshot['imageUrl'] as String : '',
-      name: snapshot['name'] != null ? snapshot['name'] as String : '',
-      quantity: snapshot['quantity'] != null ? snapshot['quantity'] as int : 0,
-    );
-  }
-
   factory OrderedProductModel.fromProductModel(
       {required ProductModel product, required int quantity}) {
     return OrderedProductModel(
@@ -56,17 +39,5 @@ class OrderedProductModel {
         cost: product.cost,
         name: product.name,
         quantity: quantity);
-  }
-
-  Map<String, Object?> toJson() {
-    return {
-      'id': id,
-      'category': category,
-      'cost': cost,
-      'description': description,
-      'imageUrl': imageUrl,
-      'quantity': quantity,
-      'name': name,
-    };
   }
 }

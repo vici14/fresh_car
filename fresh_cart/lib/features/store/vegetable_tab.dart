@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fresh_car/features/store/base_product_category_screen.dart';
 import 'package:fresh_car/model/product_model.dart';
 import 'package:fresh_car/view_model/product_view_model.dart';
-import 'package:fresh_car/view_model/user_viewmodel.dart';
 import 'package:fresh_car/widgets/ProductCardItem.dart';
 import 'package:fresh_car/widgets/product_select_dialog.dart';
 import 'package:provider/provider.dart';
@@ -25,11 +24,6 @@ class _VegetableTabState extends BaseProductCategoryScreen<VegetableTab> {
     return Consumer<ProductViewModel>(
       builder:
           (BuildContext context, ProductViewModel productVM, Widget? child) {
-        if (productVM.isLoadingVegetable) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
         if (productVM.vegetableProducts.isEmpty) {
           return Center(
             child: Text("Danh sách trống"),
@@ -43,17 +37,11 @@ class _VegetableTabState extends BaseProductCategoryScreen<VegetableTab> {
               crossAxisSpacing: 10.0,
               childAspectRatio: 1,
             ),
-            itemCount: super.userVM.isLoggedIn
-                ? productVM.vegetableProductsAfterLoggedIn.length
-                : productVM.vegetableProducts.length,
+            itemCount: productVM.vegetableProducts.length,
             itemBuilder: (context, index) {
               ProductModel product;
+              product = super.productVM.vegetableProducts[index];
 
-              if (super.userVM.isLoggedIn) {
-                product = super.productVM.vegetableProductsAfterLoggedIn[index];
-              } else {
-                product = super.productVM.vegetableProducts[index];
-              }
               return ProductCardItem(
                 productModel: product,
                 isFromHomeScreen: false,
